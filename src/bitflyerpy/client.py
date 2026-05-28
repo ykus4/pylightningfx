@@ -1,12 +1,46 @@
 import hashlib
 import hmac
-import json
 import time
 from typing import Any
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+
+import httpx
+
+from .models import (
+    Address,
+    Balance,
+    BalanceHistory,
+    BankAccount,
+    Board,
+    BoardState,
+    Chat,
+    ChildOrder,
+    CoinIn,
+    CoinOut,
+    Collateral,
+    CollateralAccount,
+    CollateralHistory,
+    CorporateLeverage,
+    Deposit,
+    Execution,
+    FundingRate,
+    FundingRateHistory,
+    Health,
+    Market,
+    MyExecution,
+    ParentOrder,
+    ParentOrderDetail,
+    Position,
+    Ticker,
+    TradingCommission,
+    Withdrawal,
+)
 
 BASE_URL = "https://api.bitflyer.com"
+
+
+def _build_params(**kwargs: Any) -> dict[str, Any] | None:
+    params = {k: v for k, v in kwargs.items() if v is not None}
+    return params or None
 
 
 class Client:
@@ -20,6 +54,13 @@ class Client:
     def __init__(self, api_key: str = "", api_secret: str = "") -> None:
         self._api_key = api_key
         self._api_secret = api_secret
+        self._http = httpx.Client(base_url=BASE_URL)
+
+    def __enter__(self) -> "Client":
+        return self
+
+    def __exit__(self, *_: Any) -> None:
+        self._http.close()
 
     # ------------------------------------------------------------------
     # HTTP helpers
@@ -33,37 +74,30 @@ class Client:
         body: dict[str, Any] | None = None,
         private: bool = False,
     ) -> Any:
-        url = BASE_URL + path
-        body_str = json.dumps(body) if body else ""
-
-        if params:
-            url += "?" + urlencode(params)
-
-        headers: dict[str, str] = {"Content-Type": "application/json"}
+        headers: dict[str, str] = {}
 
         if private:
             timestamp = str(int(time.time()))
-            query = "?" + urlencode(params) if params else ""
-            sign_text = timestamp + method + path + query + body_str
+            query = "?" + httpx.QueryParams(params).encode() if params else ""
+            body_str = httpx.Request("POST", "/", json=body).content.decode() if body else ""
             sign = hmac.new(
                 self._api_secret.encode(),
-                sign_text.encode(),
+                (timestamp + method + path + query + body_str).encode(),
                 hashlib.sha256,
             ).hexdigest()
-            headers["ACCESS-KEY"] = self._api_key
-            headers["ACCESS-TIMESTAMP"] = timestamp
-            headers["ACCESS-SIGN"] = sign
+            headers = {
+                "ACCESS-KEY": self._api_key,
+                "ACCESS-TIMESTAMP": timestamp,
+                "ACCESS-SIGN": sign,
+            }
 
-        req = Request(
-            url,
-            data=body_str.encode() if body_str else None,
-            headers=headers,
-            method=method,
-        )
-        with urlopen(req) as resp:
-            return json.loads(resp.read().decode())
+        resp = self._http.request(method, path, params=params, json=body, headers=headers)
+        resp.raise_for_status()
+        return resp.json()
 
-    def _get(self, path: str, params: dict[str, Any] | None = None, private: bool = False) -> Any:
+    def _get(
+        self, path: str, params: dict[str, Any] | None = None, *, private: bool = False
+    ) -> Any:
         return self._request("GET", path, params=params, private=private)
 
     def _post(self, path: str, body: dict[str, Any] | None = None) -> Any:
@@ -73,17 +107,17 @@ class Client:
     # HTTP Public API
     # ------------------------------------------------------------------
 
-    def get_markets(self) -> list[dict]:
+    def get_markets(self) -> list[Market]:
         """GET /v1/getmarkets — マーケットの一覧"""
-        return self._get("/v1/getmarkets")
+        return [Market(**m) for m in self._get("/v1/getmarkets")]
 
-    def get_board(self, product_code: str = "BTC_JPY") -> dict:
+    def get_board(self, product_code: str = "BTC_JPY") -> Board:
         """GET /v1/getboard — 板情報"""
-        return self._get("/v1/getboard", {"product_code": product_code})
+        return Board(**self._get("/v1/getboard", {"product_code": product_code}))
 
-    def get_ticker(self, product_code: str = "BTC_JPY") -> dict:
+    def get_ticker(self, product_code: str = "BTC_JPY") -> Ticker:
         """GET /v1/getticker — Ticker"""
-        return self._get("/v1/getticker", {"product_code": product_code})
+        return Ticker(**self._get("/v1/getticker", {"product_code": product_code}))
 
     def get_executions(
         self,
@@ -91,28 +125,25 @@ class Client:
         count: int | None = None,
         before: int | None = None,
         after: int | None = None,
-    ) -> list[dict]:
+    ) -> list[Execution]:
         """GET /v1/getexecutions — 約定履歴"""
-        params: dict[str, Any] = {"product_code": product_code}
-        if count is not None:
-            params["count"] = count
-        if before is not None:
-            params["before"] = before
-        if after is not None:
-            params["after"] = after
-        return self._get("/v1/getexecutions", params)
+        data = self._get(
+            "/v1/getexecutions",
+            _build_params(product_code=product_code, count=count, before=before, after=after),
+        )
+        return [Execution(**e) for e in data]
 
-    def get_board_state(self, product_code: str = "BTC_JPY") -> dict:
+    def get_board_state(self, product_code: str = "BTC_JPY") -> BoardState:
         """GET /v1/getboardstate — 板の状態"""
-        return self._get("/v1/getboardstate", {"product_code": product_code})
+        return BoardState(**self._get("/v1/getboardstate", {"product_code": product_code}))
 
-    def get_health(self, product_code: str = "BTC_JPY") -> dict:
+    def get_health(self, product_code: str = "BTC_JPY") -> Health:
         """GET /v1/gethealth — 取引所の状態"""
-        return self._get("/v1/gethealth", {"product_code": product_code})
+        return Health(**self._get("/v1/gethealth", {"product_code": product_code}))
 
-    def get_funding_rate(self, product_code: str) -> dict:
+    def get_funding_rate(self, product_code: str) -> FundingRate:
         """GET /v1/getfundingrate — ファンディングレート"""
-        return self._get("/v1/getfundingrate", {"product_code": product_code})
+        return FundingRate(**self._get("/v1/getfundingrate", {"product_code": product_code}))
 
     def get_funding_rate_history(
         self,
@@ -120,27 +151,20 @@ class Client:
         count: int | None = None,
         from_: str | None = None,
         to: str | None = None,
-    ) -> list[dict]:
+    ) -> list[FundingRateHistory]:
         """GET /v1/getfundingratehistory — ファンディングレート履歴"""
-        params: dict[str, Any] = {"product_code": product_code}
-        if count is not None:
-            params["count"] = count
+        params = _build_params(product_code=product_code, count=count, to=to) or {}
         if from_ is not None:
             params["from"] = from_
-        if to is not None:
-            params["to"] = to
-        return self._get("/v1/getfundingratehistory", params)
+        return [FundingRateHistory(**r) for r in self._get("/v1/getfundingratehistory", params)]
 
-    def get_corporate_leverage(self) -> dict:
+    def get_corporate_leverage(self) -> CorporateLeverage:
         """GET /v1/getcorporateleverage — 法人アカウント最大レバレッジ"""
-        return self._get("/v1/getcorporateleverage")
+        return CorporateLeverage(**self._get("/v1/getcorporateleverage"))
 
-    def get_chats(self, from_date: str | None = None) -> list[dict]:
+    def get_chats(self, from_date: str | None = None) -> list[Chat]:
         """GET /v1/getchats — チャット"""
-        params: dict[str, Any] = {}
-        if from_date is not None:
-            params["from_date"] = from_date
-        return self._get("/v1/getchats", params or None)
+        return [Chat(**c) for c in self._get("/v1/getchats", _build_params(from_date=from_date))]
 
     # ------------------------------------------------------------------
     # HTTP Private API
@@ -150,73 +174,69 @@ class Client:
         """GET /v1/me/getpermissions — APIキーの権限を取得"""
         return self._get("/v1/me/getpermissions", private=True)
 
-    def get_balance(self) -> list[dict]:
+    def get_balance(self) -> list[Balance]:
         """GET /v1/me/getbalance — 資産残高を取得"""
-        return self._get("/v1/me/getbalance", private=True)
+        return [Balance(**b) for b in self._get("/v1/me/getbalance", private=True)]
 
-    def get_collateral(self) -> dict:
+    def get_collateral(self) -> Collateral:
         """GET /v1/me/getcollateral — 証拠金の状態を取得"""
-        return self._get("/v1/me/getcollateral", private=True)
+        return Collateral(**self._get("/v1/me/getcollateral", private=True))
 
-    def get_collateral_accounts(self) -> list[dict]:
+    def get_collateral_accounts(self) -> list[CollateralAccount]:
         """GET /v1/me/getcollateralaccounts — 通貨別証拠金を取得"""
-        return self._get("/v1/me/getcollateralaccounts", private=True)
+        return [
+            CollateralAccount(**a) for a in self._get("/v1/me/getcollateralaccounts", private=True)
+        ]
 
-    def get_addresses(self) -> list[dict]:
+    def get_addresses(self) -> list[Address]:
         """GET /v1/me/getaddresses — 預入用アドレス取得"""
-        return self._get("/v1/me/getaddresses", private=True)
+        return [Address(**a) for a in self._get("/v1/me/getaddresses", private=True)]
 
     def get_coin_ins(
         self,
         count: int | None = None,
         before: int | None = None,
         after: int | None = None,
-    ) -> list[dict]:
+    ) -> list[CoinIn]:
         """GET /v1/me/getcoinins — 仮想通貨預入履歴"""
-        params: dict[str, Any] = {}
-        if count is not None:
-            params["count"] = count
-        if before is not None:
-            params["before"] = before
-        if after is not None:
-            params["after"] = after
-        return self._get("/v1/me/getcoinins", params or None, private=True)
+        data = self._get(
+            "/v1/me/getcoinins",
+            _build_params(count=count, before=before, after=after),
+            private=True,
+        )
+        return [CoinIn(**c) for c in data]
 
     def get_coin_outs(
         self,
         count: int | None = None,
         before: int | None = None,
         after: int | None = None,
-    ) -> list[dict]:
+    ) -> list[CoinOut]:
         """GET /v1/me/getcoinouts — 仮想通貨送付履歴"""
-        params: dict[str, Any] = {}
-        if count is not None:
-            params["count"] = count
-        if before is not None:
-            params["before"] = before
-        if after is not None:
-            params["after"] = after
-        return self._get("/v1/me/getcoinouts", params or None, private=True)
+        data = self._get(
+            "/v1/me/getcoinouts",
+            _build_params(count=count, before=before, after=after),
+            private=True,
+        )
+        return [CoinOut(**c) for c in data]
 
-    def get_bank_accounts(self) -> list[dict]:
+    def get_bank_accounts(self) -> list[BankAccount]:
         """GET /v1/me/getbankaccounts — 銀行口座一覧取得"""
-        return self._get("/v1/me/getbankaccounts", private=True)
+        return [BankAccount(**b) for b in self._get("/v1/me/getbankaccounts", private=True)]
 
     def get_deposits(
         self,
         count: int | None = None,
         before: int | None = None,
         after: int | None = None,
-    ) -> list[dict]:
+    ) -> list[Deposit]:
         """GET /v1/me/getdeposits — 入金履歴"""
-        params: dict[str, Any] = {}
-        if count is not None:
-            params["count"] = count
-        if before is not None:
-            params["before"] = before
-        if after is not None:
-            params["after"] = after
-        return self._get("/v1/me/getdeposits", params or None, private=True)
+        data = self._get(
+            "/v1/me/getdeposits",
+            _build_params(count=count, before=before, after=after),
+            private=True,
+        )
+        return [Deposit(**d) for d in data]
 
     def withdraw(
         self,
@@ -226,14 +246,15 @@ class Client:
         code: str | None = None,
     ) -> dict:
         """POST /v1/me/withdraw — 出金"""
-        body: dict[str, Any] = {
-            "currency_code": currency_code,
-            "bank_account_id": bank_account_id,
-            "amount": amount,
-        }
-        if code is not None:
-            body["code"] = code
-        return self._post("/v1/me/withdraw", body)
+        return self._post(
+            "/v1/me/withdraw",
+            _build_params(
+                currency_code=currency_code,
+                bank_account_id=bank_account_id,
+                amount=amount,
+                code=code,
+            ),
+        )
 
     def get_withdrawals(
         self,
@@ -241,18 +262,14 @@ class Client:
         before: int | None = None,
         after: int | None = None,
         message_id: str | None = None,
-    ) -> list[dict]:
+    ) -> list[Withdrawal]:
         """GET /v1/me/getwithdrawals — 出金履歴"""
-        params: dict[str, Any] = {}
-        if count is not None:
-            params["count"] = count
-        if before is not None:
-            params["before"] = before
-        if after is not None:
-            params["after"] = after
-        if message_id is not None:
-            params["message_id"] = message_id
-        return self._get("/v1/me/getwithdrawals", params or None, private=True)
+        data = self._get(
+            "/v1/me/getwithdrawals",
+            _build_params(count=count, before=before, after=after, message_id=message_id),
+            private=True,
+        )
+        return [Withdrawal(**w) for w in data]
 
     def send_child_order(
         self,
@@ -265,17 +282,18 @@ class Client:
         time_in_force: str = "GTC",
     ) -> dict:
         """POST /v1/me/sendchildorder — 新規注文を出す"""
-        body: dict[str, Any] = {
-            "product_code": product_code,
-            "child_order_type": child_order_type,
-            "side": side,
-            "size": size,
-            "minute_to_expire": minute_to_expire,
-            "time_in_force": time_in_force,
-        }
-        if price is not None:
-            body["price"] = price
-        return self._post("/v1/me/sendchildorder", body)
+        return self._post(
+            "/v1/me/sendchildorder",
+            _build_params(
+                product_code=product_code,
+                child_order_type=child_order_type,
+                side=side,
+                size=size,
+                price=price,
+                minute_to_expire=minute_to_expire,
+                time_in_force=time_in_force,
+            ),
+        )
 
     def cancel_child_order(
         self,
@@ -284,12 +302,14 @@ class Client:
         child_order_acceptance_id: str | None = None,
     ) -> None:
         """POST /v1/me/cancelchildorder — 注文をキャンセルする"""
-        body: dict[str, Any] = {"product_code": product_code}
-        if child_order_id is not None:
-            body["child_order_id"] = child_order_id
-        elif child_order_acceptance_id is not None:
-            body["child_order_acceptance_id"] = child_order_acceptance_id
-        self._post("/v1/me/cancelchildorder", body)
+        self._post(
+            "/v1/me/cancelchildorder",
+            _build_params(
+                product_code=product_code,
+                child_order_id=child_order_id,
+                child_order_acceptance_id=child_order_acceptance_id,
+            ),
+        )
 
     def send_parent_order(
         self,
@@ -299,13 +319,15 @@ class Client:
         time_in_force: str = "GTC",
     ) -> dict:
         """POST /v1/me/sendparentorder — 新規の親注文を出す（特殊注文）"""
-        body: dict[str, Any] = {
-            "order_method": order_method,
-            "minute_to_expire": minute_to_expire,
-            "time_in_force": time_in_force,
-            "parameters": parameters,
-        }
-        return self._post("/v1/me/sendparentorder", body)
+        return self._post(
+            "/v1/me/sendparentorder",
+            {
+                "order_method": order_method,
+                "minute_to_expire": minute_to_expire,
+                "time_in_force": time_in_force,
+                "parameters": parameters,
+            },
+        )
 
     def cancel_parent_order(
         self,
@@ -314,12 +336,14 @@ class Client:
         parent_order_acceptance_id: str | None = None,
     ) -> None:
         """POST /v1/me/cancelparentorder — 親注文をキャンセルする"""
-        body: dict[str, Any] = {"product_code": product_code}
-        if parent_order_id is not None:
-            body["parent_order_id"] = parent_order_id
-        elif parent_order_acceptance_id is not None:
-            body["parent_order_acceptance_id"] = parent_order_acceptance_id
-        self._post("/v1/me/cancelparentorder", body)
+        self._post(
+            "/v1/me/cancelparentorder",
+            _build_params(
+                product_code=product_code,
+                parent_order_id=parent_order_id,
+                parent_order_acceptance_id=parent_order_acceptance_id,
+            ),
+        )
 
     def cancel_all_child_orders(self, product_code: str) -> None:
         """POST /v1/me/cancelallchildorders — すべての注文をキャンセルする"""
@@ -335,21 +359,23 @@ class Client:
         child_order_id: str | None = None,
         child_order_acceptance_id: str | None = None,
         parent_order_id: str | None = None,
-    ) -> list[dict]:
+    ) -> list[ChildOrder]:
         """GET /v1/me/getchildorders — 注文の一覧を取得"""
-        params: dict[str, Any] = {"product_code": product_code}
-        for key, val in [
-            ("count", count),
-            ("before", before),
-            ("after", after),
-            ("child_order_state", child_order_state),
-            ("child_order_id", child_order_id),
-            ("child_order_acceptance_id", child_order_acceptance_id),
-            ("parent_order_id", parent_order_id),
-        ]:
-            if val is not None:
-                params[key] = val
-        return self._get("/v1/me/getchildorders", params, private=True)
+        data = self._get(
+            "/v1/me/getchildorders",
+            _build_params(
+                product_code=product_code,
+                count=count,
+                before=before,
+                after=after,
+                child_order_state=child_order_state,
+                child_order_id=child_order_id,
+                child_order_acceptance_id=child_order_acceptance_id,
+                parent_order_id=parent_order_id,
+            ),
+            private=True,
+        )
+        return [ChildOrder(**o) for o in data]
 
     def get_parent_orders(
         self,
@@ -358,31 +384,37 @@ class Client:
         before: int | None = None,
         after: int | None = None,
         parent_order_state: str | None = None,
-    ) -> list[dict]:
+    ) -> list[ParentOrder]:
         """GET /v1/me/getparentorders — 親注文の一覧を取得"""
-        params: dict[str, Any] = {"product_code": product_code}
-        for key, val in [
-            ("count", count),
-            ("before", before),
-            ("after", after),
-            ("parent_order_state", parent_order_state),
-        ]:
-            if val is not None:
-                params[key] = val
-        return self._get("/v1/me/getparentorders", params, private=True)
+        data = self._get(
+            "/v1/me/getparentorders",
+            _build_params(
+                product_code=product_code,
+                count=count,
+                before=before,
+                after=after,
+                parent_order_state=parent_order_state,
+            ),
+            private=True,
+        )
+        return [ParentOrder(**o) for o in data]
 
     def get_parent_order(
         self,
         parent_order_id: str | None = None,
         parent_order_acceptance_id: str | None = None,
-    ) -> dict:
+    ) -> ParentOrderDetail:
         """GET /v1/me/getparentorder — 親注文の詳細を取得"""
-        params: dict[str, Any] = {}
-        if parent_order_id is not None:
-            params["parent_order_id"] = parent_order_id
-        elif parent_order_acceptance_id is not None:
-            params["parent_order_acceptance_id"] = parent_order_acceptance_id
-        return self._get("/v1/me/getparentorder", params, private=True)
+        return ParentOrderDetail(
+            **self._get(
+                "/v1/me/getparentorder",
+                _build_params(
+                    parent_order_id=parent_order_id,
+                    parent_order_acceptance_id=parent_order_acceptance_id,
+                ),
+                private=True,
+            )
+        )
 
     def get_my_executions(
         self,
@@ -392,19 +424,21 @@ class Client:
         after: int | None = None,
         child_order_id: str | None = None,
         child_order_acceptance_id: str | None = None,
-    ) -> list[dict]:
+    ) -> list[MyExecution]:
         """GET /v1/me/getexecutions — 約定の一覧を取得"""
-        params: dict[str, Any] = {"product_code": product_code}
-        for key, val in [
-            ("count", count),
-            ("before", before),
-            ("after", after),
-            ("child_order_id", child_order_id),
-            ("child_order_acceptance_id", child_order_acceptance_id),
-        ]:
-            if val is not None:
-                params[key] = val
-        return self._get("/v1/me/getexecutions", params, private=True)
+        data = self._get(
+            "/v1/me/getexecutions",
+            _build_params(
+                product_code=product_code,
+                count=count,
+                before=before,
+                after=after,
+                child_order_id=child_order_id,
+                child_order_acceptance_id=child_order_acceptance_id,
+            ),
+            private=True,
+        )
+        return [MyExecution(**e) for e in data]
 
     def get_balance_history(
         self,
@@ -412,33 +446,43 @@ class Client:
         count: int | None = None,
         before: int | None = None,
         after: int | None = None,
-    ) -> list[dict]:
+    ) -> list[BalanceHistory]:
         """GET /v1/me/getbalancehistory — 残高履歴を取得"""
-        params: dict[str, Any] = {"currency_code": currency_code}
-        for key, val in [("count", count), ("before", before), ("after", after)]:
-            if val is not None:
-                params[key] = val
-        return self._get("/v1/me/getbalancehistory", params, private=True)
+        data = self._get(
+            "/v1/me/getbalancehistory",
+            _build_params(
+                currency_code=currency_code,
+                count=count,
+                before=before,
+                after=after,
+            ),
+            private=True,
+        )
+        return [BalanceHistory(**b) for b in data]
 
-    def get_positions(self, product_code: str = "FX_BTC_JPY") -> list[dict]:
+    def get_positions(self, product_code: str = "FX_BTC_JPY") -> list[Position]:
         """GET /v1/me/getpositions — 建玉の一覧を取得"""
-        return self._get("/v1/me/getpositions", {"product_code": product_code}, private=True)
+        return [
+            Position(**p)
+            for p in self._get("/v1/me/getpositions", {"product_code": product_code}, private=True)
+        ]
 
     def get_collateral_history(
         self,
         count: int | None = None,
         before: int | None = None,
         after: int | None = None,
-    ) -> list[dict]:
+    ) -> list[CollateralHistory]:
         """GET /v1/me/getcollateralhistory — 証拠金の変動履歴を取得"""
-        params: dict[str, Any] = {}
-        for key, val in [("count", count), ("before", before), ("after", after)]:
-            if val is not None:
-                params[key] = val
-        return self._get("/v1/me/getcollateralhistory", params or None, private=True)
+        data = self._get(
+            "/v1/me/getcollateralhistory",
+            _build_params(count=count, before=before, after=after),
+            private=True,
+        )
+        return [CollateralHistory(**c) for c in data]
 
-    def get_trading_commission(self, product_code: str) -> dict:
+    def get_trading_commission(self, product_code: str) -> TradingCommission:
         """GET /v1/me/gettradingcommission — 取引手数料を取得"""
-        return self._get(
-            "/v1/me/gettradingcommission", {"product_code": product_code}, private=True
+        return TradingCommission(
+            **self._get("/v1/me/gettradingcommission", {"product_code": product_code}, private=True)
         )

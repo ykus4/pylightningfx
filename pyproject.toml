@@ -6,7 +6,10 @@ authors = [
     { name = "yotti", email = "a2gwhitex@icloud.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.13.4",
+]
 
 [project.urls]
 Homepage = "https://github.com/ykus4/bitflyerpy"
