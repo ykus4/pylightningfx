@@ -14,7 +14,7 @@ Documentation = "https://ykus4.github.io/bitflyerpy"
 Repository = "https://github.com/ykus4/bitflyerpy"
 
 [build-system]
-requires = ["uv_build>=0.11.2,<0.12.0"]
+requires = ["uv_build>=0.11.16,<0.12.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
