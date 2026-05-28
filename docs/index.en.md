@@ -1,17 +1,17 @@
-# bitflyerpy
+# pylightningfx
 
 Python client for [bitFlyer Lightning API](https://lightning.bitflyer.com/docs).
 
 ## Installation
 
 ```bash
-pip install bitflyerpy
+pip install pylightningfx
 ```
 
 ## Quick Start
 
 ```python
-from bitflyerpy import Client
+from pylightningfx import Client
 
 # Public API (no authentication required)
 client = Client()

@@ -1,8 +1,8 @@
-site_name: bitflyerpy
-site_url: https://ykus4.github.io/bitflyerpy
+site_name: pylightningfx
+site_url: https://ykus4.github.io/pylightningfx
 site_description: Python client for bitFlyer Lightning API
-repo_url: https://github.com/ykus4/bitflyerpy
-repo_name: ykus4/bitflyerpy
+repo_url: https://github.com/ykus4/pylightningfx
+repo_name: ykus4/pylightningfx
 
 theme:
   name: material

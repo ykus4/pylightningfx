@@ -3,7 +3,7 @@
 These endpoints require authentication via API key and secret.
 
 ```python
-from bitflyerpy import Client
+from pylightningfx import Client
 
 client = Client(api_key="YOUR_API_KEY", api_secret="YOUR_API_SECRET")
 ```
