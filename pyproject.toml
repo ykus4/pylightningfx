@@ -1,0 +1,37 @@
+[project]
+name = "bitflyerpy"
+version = "0.1.0"
+description = "Python client for bitFlyer Lightning API"
+authors = [
+    { name = "yotti", email = "a2gwhitex@icloud.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/ykus4/bitflyerpy"
+Documentation = "https://ykus4.github.io/bitflyerpy"
+Repository = "https://github.com/ykus4/bitflyerpy"
+
+[build-system]
+requires = ["uv_build>=0.11.2,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.6",
+    "pre-commit>=4.6.0",
+    "pytest>=9.0.3",
+    "ruff>=0.15.14",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
