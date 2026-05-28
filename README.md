@@ -4,8 +4,8 @@ Python client for [bitFlyer Lightning API](https://lightning.bitflyer.com/docs).
 
 [![PyPI](https://img.shields.io/pypi/v/pylightningfx)](https://pypi.org/project/pylightningfx/)
 [![Python](https://img.shields.io/pypi/pyversions/pylightningfx)](https://pypi.org/project/pylightningfx/)
-[![CI](https://github.com/ykus4/bitflyerpy/actions/workflows/ci.yml/badge.svg)](https://github.com/ykus4/bitflyerpy/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/ykus4/bitflyerpy)](LICENSE)
+[![CI](https://github.com/ykus4/pylightningfx/actions/workflows/ci.yml/badge.svg)](https://github.com/ykus4/pylightningfx/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/ykus4/pylightningfx)](LICENSE)
 
 **[Documentation](https://ykus4.github.io/bitflyerpy)** · [日本語](https://ykus4.github.io/bitflyerpy/ja)
 
