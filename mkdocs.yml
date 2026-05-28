@@ -23,6 +23,19 @@ theme:
     - content.code.copy
     - navigation.sections
 
+plugins:
+  - search
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: ja
+          name: 日本語
+          build: true
+
 nav:
   - Home: index.md
   - API Reference:
