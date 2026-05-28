@@ -1,39 +1,39 @@
-from .client import Client
-from .models import (
+from .private import (
     Address,
     Balance,
     BalanceHistory,
     BankAccount,
-    Board,
-    BoardEntry,
-    BoardState,
-    Chat,
     ChildOrder,
     CoinIn,
     CoinOut,
     Collateral,
     CollateralAccount,
     CollateralHistory,
-    CorporateLeverage,
     Deposit,
-    Execution,
-    FundingRate,
-    FundingRateHistory,
-    Health,
-    Market,
     MyExecution,
     ParentOrder,
     ParentOrderDetail,
     ParentOrderParameter,
     Position,
-    Ticker,
     TradingCommission,
     Withdrawal,
 )
+from .public import (
+    Board,
+    BoardEntry,
+    BoardState,
+    Chat,
+    CorporateLeverage,
+    Execution,
+    FundingRate,
+    FundingRateHistory,
+    Health,
+    Market,
+    Ticker,
+)
 
 __all__ = [
-    "Client",
-    # public models
+    # public
     "Board",
     "BoardEntry",
     "BoardState",
@@ -45,7 +45,7 @@ __all__ = [
     "Health",
     "Market",
     "Ticker",
-    # private models
+    # private
     "Address",
     "Balance",
     "BalanceHistory",
