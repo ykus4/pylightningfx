@@ -1,5 +1,5 @@
 [project]
-name = "bitflyerpy"
+name = "pylightningfx"
 version = "0.1.0"
 description = "Python client for bitFlyer Lightning API"
 authors = [
@@ -25,10 +25,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ykus4/bitflyerpy"
-Documentation = "https://ykus4.github.io/bitflyerpy"
-Repository = "https://github.com/ykus4/bitflyerpy"
-"Bug Tracker" = "https://github.com/ykus4/bitflyerpy/issues"
+Homepage = "https://github.com/ykus4/pylightningfx"
+Documentation = "https://ykus4.github.io/pylightningfx"
+Repository = "https://github.com/ykus4/pylightningfx"
+"Bug Tracker" = "https://github.com/ykus4/pylightningfx/issues"
 
 [build-system]
 requires = ["uv_build>=0.11.2,<0.12.0"]

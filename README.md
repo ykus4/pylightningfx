@@ -1,9 +1,9 @@
-# bitflyerpy
+# pylightningfx
 
 Python client for [bitFlyer Lightning API](https://lightning.bitflyer.com/docs).
 
-[![PyPI](https://img.shields.io/pypi/v/bitflyerpy)](https://pypi.org/project/bitflyerpy/)
-[![Python](https://img.shields.io/pypi/pyversions/bitflyerpy)](https://pypi.org/project/bitflyerpy/)
+[![PyPI](https://img.shields.io/pypi/v/pylightningfx)](https://pypi.org/project/pylightningfx/)
+[![Python](https://img.shields.io/pypi/pyversions/pylightningfx)](https://pypi.org/project/pylightningfx/)
 [![CI](https://github.com/ykus4/bitflyerpy/actions/workflows/ci.yml/badge.svg)](https://github.com/ykus4/bitflyerpy/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/ykus4/bitflyerpy)](LICENSE)
 
@@ -12,13 +12,13 @@ Python client for [bitFlyer Lightning API](https://lightning.bitflyer.com/docs).
 ## Installation
 
 ```bash
-pip install bitflyerpy
+pip install pylightningfx
 ```
 
 ## Usage
 
 ```python
-from bitflyerpy import Client
+from pylightningfx import Client
 
 client = Client(api_key="YOUR_API_KEY", api_secret="YOUR_API_SECRET")
 print(client.get_ticker("BTC_JPY"))

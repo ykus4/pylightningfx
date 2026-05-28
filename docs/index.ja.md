@@ -1,17 +1,17 @@
-# bitflyerpy
+# pylightningfx
 
 [bitFlyer Lightning API](https://lightning.bitflyer.com/docs) の Python クライアントです。
 
 ## インストール
 
 ```bash
-pip install bitflyerpy
+pip install pylightningfx
 ```
 
 ## クイックスタート
 
 ```python
-from bitflyerpy import Client
+from pylightningfx import Client
 
 # Public API（認証不要）
 client = Client()

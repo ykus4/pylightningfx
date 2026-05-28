@@ -1,6 +1,6 @@
 import httpx
 
-from bitflyerpy import Board, Client, Market, Ticker
+from pylightningfx import Board, Client, Market, Ticker
 
 
 def _client(response_data) -> Client:

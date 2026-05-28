@@ -3,7 +3,7 @@
 API キーと API シークレットによる認証が必要です。
 
 ```python
-from bitflyerpy import Client
+from pylightningfx import Client
 
 client = Client(api_key="YOUR_API_KEY", api_secret="YOUR_API_SECRET")
 ```
