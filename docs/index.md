@@ -16,7 +16,7 @@ from bitflyerpy import Client
 # Public API (no authentication required)
 client = Client()
 ticker = client.get_ticker("BTC_JPY")
-print(ticker["ltp"])  # 最終取引価格
+print(ticker["ltp"])  # Last traded price
 
 # Private API
 client = Client(api_key="YOUR_API_KEY", api_secret="YOUR_API_SECRET")

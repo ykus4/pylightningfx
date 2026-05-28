@@ -1,6 +1,6 @@
 # Public API
 
-認証不要で利用できるエンドポイントです。
+Endpoints that do not require authentication.
 
 ## get_markets
 
@@ -8,7 +8,7 @@
 client.get_markets() -> list[dict]
 ```
 
-マーケットの一覧を取得します。
+Returns a list of available markets.
 
 **Example response:**
 ```json
@@ -26,7 +26,7 @@ client.get_markets() -> list[dict]
 client.get_board(product_code: str = "BTC_JPY") -> dict
 ```
 
-板情報を取得します。
+Returns the order book for the specified market.
 
 ---
 
@@ -36,13 +36,13 @@ client.get_board(product_code: str = "BTC_JPY") -> dict
 client.get_ticker(product_code: str = "BTC_JPY") -> dict
 ```
 
-Ticker を取得します。
+Returns the latest ticker for the specified market.
 
 | Field | Description |
 |-------|-------------|
-| `ltp` | 最終取引価格 |
-| `best_bid` / `best_ask` | ベストビッド/アスク |
-| `volume` | 24時間の取引量 |
+| `ltp` | Last traded price |
+| `best_bid` / `best_ask` | Best bid / ask price |
+| `volume` | 24-hour trading volume |
 
 ---
 
@@ -57,7 +57,7 @@ client.get_executions(
 ) -> list[dict]
 ```
 
-約定履歴を取得します（過去31日分）。
+Returns execution history (up to 31 days in the past).
 
 ---
 
@@ -67,7 +67,7 @@ client.get_executions(
 client.get_board_state(product_code: str = "BTC_JPY") -> dict
 ```
 
-板の状態を取得します。`health` と `state` を返します。
+Returns the current state of the order book, including `health` and `state`.
 
 ---
 
@@ -77,7 +77,7 @@ client.get_board_state(product_code: str = "BTC_JPY") -> dict
 client.get_health(product_code: str = "BTC_JPY") -> dict
 ```
 
-取引所の稼動状態を取得します。
+Returns the current operational status of the exchange.
 
 ---
 
@@ -87,7 +87,7 @@ client.get_health(product_code: str = "BTC_JPY") -> dict
 client.get_funding_rate(product_code: str) -> dict
 ```
 
-次回徴収・付与予定のファンディングレート授受率を取得します。`product_code` は必須 (`FX_BTC_JPY` など)。
+Returns the next scheduled funding rate. `product_code` is required (e.g. `FX_BTC_JPY`).
 
 ---
 
@@ -102,7 +102,7 @@ client.get_funding_rate_history(
 ) -> list[dict]
 ```
 
-過去のファンディングレート履歴を取得します。
+Returns historical funding rates.
 
 ---
 
@@ -112,7 +112,7 @@ client.get_funding_rate_history(
 client.get_corporate_leverage() -> dict
 ```
 
-法人アカウントの最大レバレッジを取得します。
+Returns the maximum leverage for corporate accounts.
 
 ---
 
@@ -122,4 +122,4 @@ client.get_corporate_leverage() -> dict
 client.get_chats(from_date: str | None = None) -> list[dict]
 ```
 
-チャットの発言一覧を取得します。省略時は5日前からの発言を返します。
+Returns chat messages. Defaults to messages from the past 5 days if `from_date` is omitted.

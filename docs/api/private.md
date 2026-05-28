@@ -1,6 +1,6 @@
 # Private API
 
-API key と API secret による認証が必要です。
+These endpoints require authentication via API key and secret.
 
 ```python
 from bitflyerpy import Client
@@ -16,7 +16,7 @@ client = Client(api_key="YOUR_API_KEY", api_secret="YOUR_API_SECRET")
 client.get_permissions() -> list[str]
 ```
 
-この API キーで呼出可能なエンドポイントの一覧を取得します。
+Returns a list of endpoints accessible with the current API key.
 
 ---
 
@@ -26,7 +26,7 @@ client.get_permissions() -> list[str]
 client.get_balance() -> list[dict]
 ```
 
-資産残高を取得します。
+Returns the account balance for each currency.
 
 ---
 
@@ -37,7 +37,7 @@ client.get_collateral() -> dict
 client.get_collateral_accounts() -> list[dict]
 ```
 
-証拠金の状態・通貨別数量を取得します。
+Returns collateral status and per-currency collateral amounts.
 
 ---
 
@@ -47,7 +47,7 @@ client.get_collateral_accounts() -> list[dict]
 client.get_addresses() -> list[dict]
 ```
 
-仮想通貨の預入用アドレスを取得します。
+Returns deposit addresses for each cryptocurrency.
 
 ---
 
@@ -58,7 +58,7 @@ client.get_coin_ins(count, before, after) -> list[dict]
 client.get_coin_outs(count, before, after) -> list[dict]
 ```
 
-仮想通貨の預入・送付履歴を取得します。
+Returns cryptocurrency deposit and withdrawal history.
 
 ---
 
@@ -68,7 +68,7 @@ client.get_coin_outs(count, before, after) -> list[dict]
 client.get_bank_accounts() -> list[dict]
 ```
 
-登録済み銀行口座の一覧を取得します。
+Returns a list of registered bank accounts.
 
 ---
 
@@ -79,7 +79,7 @@ client.get_deposits(count, before, after) -> list[dict]
 client.get_withdrawals(count, before, after, message_id) -> list[dict]
 ```
 
-入金・出金履歴を取得します。
+Returns fiat deposit and withdrawal history.
 
 ---
 
@@ -94,7 +94,7 @@ client.withdraw(
 ) -> dict
 ```
 
-出金を行います。二段階認証が必要な場合は `code` を指定してください。
+Submits a withdrawal request. Pass `code` if two-factor authentication is required.
 
 ---
 
@@ -112,7 +112,7 @@ client.send_child_order(
 ) -> dict
 ```
 
-新規注文を発注します。
+Places a new order.
 
 ---
 
@@ -126,7 +126,7 @@ client.cancel_child_order(
 ) -> None
 ```
 
-注文をキャンセルします。
+Cancels an existing order. Provide either `child_order_id` or `child_order_acceptance_id`.
 
 ---
 
@@ -141,7 +141,7 @@ client.send_parent_order(
 ) -> dict
 ```
 
-特殊注文（IFD/OCO/IFDOCO）を発注します。
+Places a special order (IFD / OCO / IFDOCO).
 
 ---
 
@@ -152,7 +152,7 @@ client.cancel_parent_order(product_code, parent_order_id, parent_order_acceptanc
 client.cancel_all_child_orders(product_code: str) -> None
 ```
 
-親注文・全注文をキャンセルします。
+Cancels a parent order or all open orders for a product.
 
 ---
 
@@ -164,17 +164,20 @@ client.get_parent_orders(product_code, count, before, after, parent_order_state)
 client.get_parent_order(parent_order_id, parent_order_acceptance_id) -> dict
 ```
 
-注文の一覧・詳細を取得します。
+Returns order lists and details.
 
 ---
 
 ## get_my_executions
 
 ```python
-client.get_my_executions(product_code, count, before, after, child_order_id, child_order_acceptance_id) -> list[dict]
+client.get_my_executions(
+    product_code, count, before, after,
+    child_order_id, child_order_acceptance_id,
+) -> list[dict]
 ```
 
-自分の約定一覧を取得します。
+Returns your personal execution history.
 
 ---
 
@@ -184,7 +187,7 @@ client.get_my_executions(product_code, count, before, after, child_order_id, chi
 client.get_balance_history(currency_code: str = "JPY", count, before, after) -> list[dict]
 ```
 
-残高履歴を取得します。
+Returns balance change history for the specified currency.
 
 ---
 
@@ -194,7 +197,7 @@ client.get_balance_history(currency_code: str = "JPY", count, before, after) -> 
 client.get_positions(product_code: str = "FX_BTC_JPY") -> list[dict]
 ```
 
-建玉の一覧を取得します。
+Returns open CFD positions.
 
 ---
 
@@ -204,7 +207,7 @@ client.get_positions(product_code: str = "FX_BTC_JPY") -> list[dict]
 client.get_collateral_history(count, before, after) -> list[dict]
 ```
 
-証拠金の変動履歴を取得します。
+Returns collateral change history.
 
 ---
 
@@ -214,4 +217,4 @@ client.get_collateral_history(count, before, after) -> list[dict]
 client.get_trading_commission(product_code: str) -> dict
 ```
 
-取引手数料を取得します。
+Returns the trading commission rate for the specified product.
