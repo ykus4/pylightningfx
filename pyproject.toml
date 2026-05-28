@@ -3,7 +3,20 @@ name = "bitflyerpy"
 version = "0.1.0"
 description = "Python client for bitFlyer Lightning API"
 authors = [
-    { name = "yotti", email = "a2gwhitex@icloud.com" }
+    { name = "ykus4", email = "a2gwhitex@icloud.com" }
+]
+license = "MIT"
+readme = "README.md"
+keywords = ["bitflyer", "bitcoin", "crypto", "trading", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -15,6 +28,7 @@ dependencies = [
 Homepage = "https://github.com/ykus4/bitflyerpy"
 Documentation = "https://ykus4.github.io/bitflyerpy"
 Repository = "https://github.com/ykus4/bitflyerpy"
+"Bug Tracker" = "https://github.com/ykus4/bitflyerpy/issues"
 
 [build-system]
 requires = ["uv_build>=0.11.2,<0.12.0"]
