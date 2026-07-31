@@ -1,9 +1,9 @@
-"""Private API endpoints, which require an API key and secret."""
+"""Private API endpoints, which require an API key and secret. (async variant)"""
 
 from collections.abc import Sequence
 from typing import Any
 
-from ._engine import SyncEngine
+from ._engine import AsyncEngine
 from ._params import build_params
 from .enums import OrderMethod, ProductCode, TimeInForce
 from .models.private import (
@@ -45,10 +45,10 @@ def _legs(parameters: Sequence[ParentOrderParameter | dict[str, Any]]) -> list[d
     return legs
 
 
-class PrivateAPI(SyncEngine):
+class AsyncPrivateAPI(AsyncEngine):
     """Account, order and history endpoints.
 
-    Mixed into [`Client`][pylightningfx.Client]; not meant to be instantiated on
+    Mixed into [`AsyncClient`][pylightningfx.AsyncClient]; not meant to be instantiated on
     its own. Every method here raises
     [`CredentialsError`][pylightningfx.CredentialsError] if the client was built without an
     ``api_key`` and ``api_secret``.
@@ -58,43 +58,47 @@ class PrivateAPI(SyncEngine):
     and ``after`` bound the ``id`` field exclusively.
     """
 
-    def get_permissions(self) -> list[str]:
+    async def get_permissions(self) -> list[str]:
         """List the endpoints this API key is allowed to call.
 
         Wraps ``GET /v1/me/getpermissions``.
         """
-        return list(self._get("/v1/me/getpermissions", private=True))
+        return list(await self._get("/v1/me/getpermissions", private=True))
 
-    def get_balance(self) -> list[Balance]:
+    async def get_balance(self) -> list[Balance]:
         """Fetch balances for every currency.
 
         Wraps ``GET /v1/me/getbalance``.
         """
-        return [Balance.model_validate(b) for b in self._get("/v1/me/getbalance", private=True)]
+        return [
+            Balance.model_validate(b) for b in await self._get("/v1/me/getbalance", private=True)
+        ]
 
-    def get_collateral(self) -> Collateral:
+    async def get_collateral(self) -> Collateral:
         """Fetch margin status for the account.
 
         Wraps ``GET /v1/me/getcollateral``.
         """
-        return Collateral.model_validate(self._get("/v1/me/getcollateral", private=True))
+        return Collateral.model_validate(await self._get("/v1/me/getcollateral", private=True))
 
-    def get_collateral_accounts(self) -> list[CollateralAccount]:
+    async def get_collateral_accounts(self) -> list[CollateralAccount]:
         """Fetch collateral held per currency.
 
         Wraps ``GET /v1/me/getcollateralaccounts``.
         """
-        data = self._get("/v1/me/getcollateralaccounts", private=True)
+        data = await self._get("/v1/me/getcollateralaccounts", private=True)
         return [CollateralAccount.model_validate(a) for a in data]
 
-    def get_addresses(self) -> list[Address]:
+    async def get_addresses(self) -> list[Address]:
         """List your crypto deposit addresses.
 
         Wraps ``GET /v1/me/getaddresses``.
         """
-        return [Address.model_validate(a) for a in self._get("/v1/me/getaddresses", private=True)]
+        return [
+            Address.model_validate(a) for a in await self._get("/v1/me/getaddresses", private=True)
+        ]
 
-    def get_coin_ins(
+    async def get_coin_ins(
         self,
         count: int | None = None,
         before: int | None = None,
@@ -104,14 +108,14 @@ class PrivateAPI(SyncEngine):
 
         Wraps ``GET /v1/me/getcoinins``.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getcoinins",
             build_params(count=count, before=before, after=after),
             private=True,
         )
         return [CoinIn.model_validate(c) for c in data]
 
-    def get_coin_outs(
+    async def get_coin_outs(
         self,
         count: int | None = None,
         before: int | None = None,
@@ -121,22 +125,22 @@ class PrivateAPI(SyncEngine):
 
         Wraps ``GET /v1/me/getcoinouts``.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getcoinouts",
             build_params(count=count, before=before, after=after),
             private=True,
         )
         return [CoinOut.model_validate(c) for c in data]
 
-    def get_bank_accounts(self) -> list[BankAccount]:
+    async def get_bank_accounts(self) -> list[BankAccount]:
         """List your registered bank accounts.
 
         Wraps ``GET /v1/me/getbankaccounts``.
         """
-        data = self._get("/v1/me/getbankaccounts", private=True)
+        data = await self._get("/v1/me/getbankaccounts", private=True)
         return [BankAccount.model_validate(b) for b in data]
 
-    def get_deposits(
+    async def get_deposits(
         self,
         count: int | None = None,
         before: int | None = None,
@@ -146,14 +150,14 @@ class PrivateAPI(SyncEngine):
 
         Wraps ``GET /v1/me/getdeposits``.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getdeposits",
             build_params(count=count, before=before, after=after),
             private=True,
         )
         return [Deposit.model_validate(d) for d in data]
 
-    def withdraw(
+    async def withdraw(
         self,
         currency_code: str,
         bank_account_id: int,
@@ -170,12 +174,13 @@ class PrivateAPI(SyncEngine):
         Args:
             currency_code: Currency to withdraw, e.g. ``"JPY"``.
             bank_account_id: [`id`][pylightningfx.models.private.BankAccount.id] of the
-                destination, from [`get_bank_accounts()`][pylightningfx.Client.get_bank_accounts].
+                destination, from
+                [`get_bank_accounts()`][pylightningfx.AsyncClient.get_bank_accounts].
             amount: Amount to withdraw.
             code: Two-factor confirmation code, if your account requires one.
         """
         return WithdrawResponse.model_validate(
-            self._post(
+            await self._post(
                 "/v1/me/withdraw",
                 build_params(
                     currency_code=currency_code,
@@ -186,7 +191,7 @@ class PrivateAPI(SyncEngine):
             )
         )
 
-    def get_withdrawals(
+    async def get_withdrawals(
         self,
         count: int | None = None,
         before: int | None = None,
@@ -204,14 +209,14 @@ class PrivateAPI(SyncEngine):
             message_id: Narrow to the withdrawal started by this
                 [`message_id`][pylightningfx.models.private.WithdrawResponse.message_id].
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getwithdrawals",
             build_params(count=count, before=before, after=after, message_id=message_id),
             private=True,
         )
         return [Withdrawal.model_validate(w) for w in data]
 
-    def send_child_order(
+    async def send_child_order(
         self,
         product_code: str,
         child_order_type: str,
@@ -240,7 +245,7 @@ class PrivateAPI(SyncEngine):
                 [`TimeInForce`][pylightningfx.enums.TimeInForce].
         """
         return ChildOrderResponse.model_validate(
-            self._post(
+            await self._post(
                 "/v1/me/sendchildorder",
                 build_params(
                     product_code=product_code,
@@ -254,7 +259,7 @@ class PrivateAPI(SyncEngine):
             )
         )
 
-    def cancel_child_order(
+    async def cancel_child_order(
         self,
         product_code: str = ProductCode.BTC_JPY,
         child_order_id: str | None = None,
@@ -269,9 +274,9 @@ class PrivateAPI(SyncEngine):
             product_code: Market the order is on.
             child_order_id: Exchange-assigned order id.
             child_order_acceptance_id: Acceptance id returned by
-                [`send_child_order()`][pylightningfx.Client.send_child_order].
+                [`send_child_order()`][pylightningfx.AsyncClient.send_child_order].
         """
-        self._post(
+        await self._post(
             "/v1/me/cancelchildorder",
             build_params(
                 product_code=product_code,
@@ -280,7 +285,7 @@ class PrivateAPI(SyncEngine):
             ),
         )
 
-    def send_parent_order(
+    async def send_parent_order(
         self,
         parameters: Sequence[ParentOrderParameter | dict[str, Any]],
         order_method: str = OrderMethod.SIMPLE,
@@ -311,9 +316,9 @@ class PrivateAPI(SyncEngine):
         }
         if minute_to_expire is not None:
             body["minute_to_expire"] = minute_to_expire
-        return ParentOrderResponse.model_validate(self._post("/v1/me/sendparentorder", body))
+        return ParentOrderResponse.model_validate(await self._post("/v1/me/sendparentorder", body))
 
-    def cancel_parent_order(
+    async def cancel_parent_order(
         self,
         product_code: str = ProductCode.BTC_JPY,
         parent_order_id: str | None = None,
@@ -324,7 +329,7 @@ class PrivateAPI(SyncEngine):
         Wraps ``POST /v1/me/cancelparentorder``, which answers with an empty body
         on success. Pass exactly one of the two identifiers.
         """
-        self._post(
+        await self._post(
             "/v1/me/cancelparentorder",
             build_params(
                 product_code=product_code,
@@ -333,15 +338,15 @@ class PrivateAPI(SyncEngine):
             ),
         )
 
-    def cancel_all_child_orders(self, product_code: str = ProductCode.BTC_JPY) -> None:
+    async def cancel_all_child_orders(self, product_code: str = ProductCode.BTC_JPY) -> None:
         """Cancel every open order on one market.
 
         Wraps ``POST /v1/me/cancelallchildorders``, which answers with an empty
         body on success.
         """
-        self._post("/v1/me/cancelallchildorders", {"product_code": product_code})
+        await self._post("/v1/me/cancelallchildorders", {"product_code": product_code})
 
-    def get_child_orders(
+    async def get_child_orders(
         self,
         product_code: str = ProductCode.BTC_JPY,
         count: int | None = None,
@@ -367,7 +372,7 @@ class PrivateAPI(SyncEngine):
             child_order_acceptance_id: Narrow to one order by acceptance id.
             parent_order_id: Narrow to the children of one parent order.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getchildorders",
             build_params(
                 product_code=product_code,
@@ -383,7 +388,7 @@ class PrivateAPI(SyncEngine):
         )
         return [ChildOrder.model_validate(o) for o in data]
 
-    def get_parent_orders(
+    async def get_parent_orders(
         self,
         product_code: str = ProductCode.BTC_JPY,
         count: int | None = None,
@@ -394,7 +399,7 @@ class PrivateAPI(SyncEngine):
         """List your parent orders.
 
         Wraps ``GET /v1/me/getparentorders``. The rows summarise each parent
-        order; call [`get_parent_order()`][pylightningfx.Client.get_parent_order] for its legs.
+        order; call [`get_parent_order()`][pylightningfx.AsyncClient.get_parent_order] for its legs.
 
         Args:
             product_code: Market to query.
@@ -404,7 +409,7 @@ class PrivateAPI(SyncEngine):
             parent_order_state: Filter by state. See
                 [`ParentOrderState`][pylightningfx.enums.ParentOrderState].
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getparentorders",
             build_params(
                 product_code=product_code,
@@ -417,7 +422,7 @@ class PrivateAPI(SyncEngine):
         )
         return [ParentOrder.model_validate(o) for o in data]
 
-    def get_parent_order(
+    async def get_parent_order(
         self,
         parent_order_id: str | None = None,
         parent_order_acceptance_id: str | None = None,
@@ -428,7 +433,7 @@ class PrivateAPI(SyncEngine):
         identifiers.
         """
         return ParentOrderDetail.model_validate(
-            self._get(
+            await self._get(
                 "/v1/me/getparentorder",
                 build_params(
                     parent_order_id=parent_order_id,
@@ -438,7 +443,7 @@ class PrivateAPI(SyncEngine):
             )
         )
 
-    def get_my_executions(
+    async def get_my_executions(
         self,
         product_code: str = ProductCode.BTC_JPY,
         count: int | None = None,
@@ -450,7 +455,7 @@ class PrivateAPI(SyncEngine):
         """List your fills.
 
         Wraps ``GET /v1/me/getexecutions``. Named ``get_my_executions`` to keep
-        it distinct from the public [`get_executions()`][pylightningfx.Client.get_executions].
+        it distinct from the public [`get_executions()`][pylightningfx.AsyncClient.get_executions].
 
         Args:
             product_code: Market to query.
@@ -461,7 +466,7 @@ class PrivateAPI(SyncEngine):
             child_order_acceptance_id: Narrow to the fills of one order by
                 acceptance id.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getexecutions",
             build_params(
                 product_code=product_code,
@@ -475,7 +480,7 @@ class PrivateAPI(SyncEngine):
         )
         return [MyExecution.model_validate(e) for e in data]
 
-    def get_balance_history(
+    async def get_balance_history(
         self,
         currency_code: str = "JPY",
         count: int | None = None,
@@ -486,14 +491,14 @@ class PrivateAPI(SyncEngine):
 
         Wraps ``GET /v1/me/getbalancehistory``.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getbalancehistory",
             build_params(currency_code=currency_code, count=count, before=before, after=after),
             private=True,
         )
         return [BalanceHistory.model_validate(b) for b in data]
 
-    def get_positions(self, product_code: str = ProductCode.FX_BTC_JPY) -> list[Position]:
+    async def get_positions(self, product_code: str = ProductCode.FX_BTC_JPY) -> list[Position]:
         """List open leveraged positions.
 
         Wraps ``GET /v1/me/getpositions``. Positions come back individually
@@ -502,10 +507,10 @@ class PrivateAPI(SyncEngine):
         Args:
             product_code: Leveraged market to query.
         """
-        data = self._get("/v1/me/getpositions", {"product_code": product_code}, private=True)
+        data = await self._get("/v1/me/getpositions", {"product_code": product_code}, private=True)
         return [Position.model_validate(p) for p in data]
 
-    def get_collateral_history(
+    async def get_collateral_history(
         self,
         count: int | None = None,
         before: int | None = None,
@@ -515,18 +520,22 @@ class PrivateAPI(SyncEngine):
 
         Wraps ``GET /v1/me/getcollateralhistory``.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/me/getcollateralhistory",
             build_params(count=count, before=before, after=after),
             private=True,
         )
         return [CollateralHistory.model_validate(c) for c in data]
 
-    def get_trading_commission(self, product_code: str = ProductCode.BTC_JPY) -> TradingCommission:
+    async def get_trading_commission(
+        self, product_code: str = ProductCode.BTC_JPY
+    ) -> TradingCommission:
         """Fetch your commission rate for one market.
 
         Wraps ``GET /v1/me/gettradingcommission``.
         """
         return TradingCommission.model_validate(
-            self._get("/v1/me/gettradingcommission", {"product_code": product_code}, private=True)
+            await self._get(
+                "/v1/me/gettradingcommission", {"product_code": product_code}, private=True
+            )
         )

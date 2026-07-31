@@ -13,10 +13,33 @@ jobs:
       - run: uv sync --group dev
       - uses: pre-commit/action@v3.0.1
 
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --group dev
+      - run: uv run mypy
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
       - run: uv sync --group dev
-      - run: uv run pytest
+      - run: uv run pytest --cov --cov-report=term-missing --cov-report=xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage.xml
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --group dev
+      # --strict fails on a broken cross-reference or a nav entry pointing at a
+      # file that does not exist, which is how stale docs used to slip through.
+      - run: uv run mkdocs build --strict
