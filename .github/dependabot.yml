@@ -9,3 +9,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  # ruff is pinned twice: as a dev dependency and as a pre-commit hook rev. Without
+  # this, the hook silently drifts behind and CI lints with a different version
+  # than developers do.
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "weekly"
