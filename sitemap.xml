@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/api/client/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/client/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/client/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/api/config/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/config/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/config/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/api/enums/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/enums/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/enums/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/api/errors/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/errors/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/errors/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/api/models/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/models/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/models/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/api/realtime/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/realtime/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/realtime/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/ja/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/ja/api/client/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/client/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/client/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/ja/api/config/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/config/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/config/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/ja/api/enums/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/enums/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/enums/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/ja/api/errors/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/errors/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/errors/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/ja/api/models/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/models/"/>
+    </url>
+    <url>
+        <loc>https://ykus4.github.io/pylightningfx/ja/api/realtime/</loc>
+        <lastmod>2026-07-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://ykus4.github.io/pylightningfx/ja/api/realtime/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://ykus4.github.io/pylightningfx/api/realtime/"/>
+    </url>
+</urlset>
