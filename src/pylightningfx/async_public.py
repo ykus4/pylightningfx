@@ -1,6 +1,6 @@
-"""Public API endpoints, which need no authentication."""
+"""Public API endpoints, which need no authentication. (async variant)"""
 
-from ._engine import SyncEngine
+from ._engine import AsyncEngine
 from ._params import build_params
 from .enums import ProductCode
 from .models.public import (
@@ -17,10 +17,10 @@ from .models.public import (
 )
 
 
-class PublicAPI(SyncEngine):
+class AsyncPublicAPI(AsyncEngine):
     """Market data endpoints.
 
-    Mixed into [`Client`][pylightningfx.Client]; not meant to be instantiated on
+    Mixed into [`AsyncClient`][pylightningfx.AsyncClient]; not meant to be instantiated on
     its own.
 
     Endpoints that return a history take ``count``, ``before`` and ``after``.
@@ -29,14 +29,14 @@ class PublicAPI(SyncEngine):
     passing the lowest ``id`` you have seen as ``before``.
     """
 
-    def get_markets(self) -> list[Market]:
+    async def get_markets(self) -> list[Market]:
         """List the available markets.
 
         Wraps ``GET /v1/getmarkets``.
         """
-        return [Market.model_validate(m) for m in self._get("/v1/getmarkets")]
+        return [Market.model_validate(m) for m in await self._get("/v1/getmarkets")]
 
-    def get_board(self, product_code: str = ProductCode.BTC_JPY) -> Board:
+    async def get_board(self, product_code: str = ProductCode.BTC_JPY) -> Board:
         """Fetch the order book.
 
         Wraps ``GET /v1/getboard``.
@@ -44,9 +44,9 @@ class PublicAPI(SyncEngine):
         Args:
             product_code: Market to query.
         """
-        return Board.model_validate(self._get("/v1/getboard", {"product_code": product_code}))
+        return Board.model_validate(await self._get("/v1/getboard", {"product_code": product_code}))
 
-    def get_ticker(self, product_code: str = ProductCode.BTC_JPY) -> Ticker:
+    async def get_ticker(self, product_code: str = ProductCode.BTC_JPY) -> Ticker:
         """Fetch the ticker.
 
         Wraps ``GET /v1/getticker``.
@@ -54,9 +54,11 @@ class PublicAPI(SyncEngine):
         Args:
             product_code: Market to query.
         """
-        return Ticker.model_validate(self._get("/v1/getticker", {"product_code": product_code}))
+        return Ticker.model_validate(
+            await self._get("/v1/getticker", {"product_code": product_code})
+        )
 
-    def get_executions(
+    async def get_executions(
         self,
         product_code: str = ProductCode.BTC_JPY,
         count: int | None = None,
@@ -73,27 +75,27 @@ class PublicAPI(SyncEngine):
             before: Return only trades with a lower ``id``.
             after: Return only trades with a higher ``id``.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/getexecutions",
             build_params(product_code=product_code, count=count, before=before, after=after),
         )
         return [Execution.model_validate(e) for e in data]
 
-    def get_board_state(self, product_code: str = ProductCode.BTC_JPY) -> BoardState:
+    async def get_board_state(self, product_code: str = ProductCode.BTC_JPY) -> BoardState:
         """Fetch the order book state.
 
         Wraps ``GET /v1/getboardstate``. Use this rather than
-        [`get_health()`][pylightningfx.Client.get_health]
+        [`get_health()`][pylightningfx.AsyncClient.get_health]
         to decide whether orders are being accepted right now.
 
         Args:
             product_code: Market to query.
         """
         return BoardState.model_validate(
-            self._get("/v1/getboardstate", {"product_code": product_code})
+            await self._get("/v1/getboardstate", {"product_code": product_code})
         )
 
-    def get_health(self, product_code: str = ProductCode.BTC_JPY) -> Health:
+    async def get_health(self, product_code: str = ProductCode.BTC_JPY) -> Health:
         """Fetch exchange health.
 
         Wraps ``GET /v1/gethealth``.
@@ -101,9 +103,11 @@ class PublicAPI(SyncEngine):
         Args:
             product_code: Market to query.
         """
-        return Health.model_validate(self._get("/v1/gethealth", {"product_code": product_code}))
+        return Health.model_validate(
+            await self._get("/v1/gethealth", {"product_code": product_code})
+        )
 
-    def get_funding_rate(self, product_code: str = ProductCode.FX_BTC_JPY) -> FundingRate:
+    async def get_funding_rate(self, product_code: str = ProductCode.FX_BTC_JPY) -> FundingRate:
         """Fetch the current funding rate.
 
         Wraps ``GET /v1/getfundingrate``. Only perpetual markets have one.
@@ -112,10 +116,10 @@ class PublicAPI(SyncEngine):
             product_code: Perpetual market to query.
         """
         return FundingRate.model_validate(
-            self._get("/v1/getfundingrate", {"product_code": product_code})
+            await self._get("/v1/getfundingrate", {"product_code": product_code})
         )
 
-    def get_funding_rate_history(
+    async def get_funding_rate_history(
         self,
         product_code: str = ProductCode.FX_BTC_JPY,
         count: int | None = None,
@@ -133,20 +137,20 @@ class PublicAPI(SyncEngine):
                 is a Python keyword, hence the trailing underscore.
             to: Inclusive end date, ``YYYY-MM-DD``.
         """
-        data = self._get(
+        data = await self._get(
             "/v1/getfundingratehistory",
             build_params(product_code=product_code, count=count, from_=from_, to=to),
         )
         return [FundingRateHistory.model_validate(r) for r in data]
 
-    def get_corporate_leverage(self) -> CorporateLeverage:
+    async def get_corporate_leverage(self) -> CorporateLeverage:
         """Fetch the maximum leverage available to corporate accounts.
 
         Wraps ``GET /v1/getcorporateleverage``.
         """
-        return CorporateLeverage.model_validate(self._get("/v1/getcorporateleverage"))
+        return CorporateLeverage.model_validate(await self._get("/v1/getcorporateleverage"))
 
-    def get_chats(self, from_date: str | None = None) -> list[Chat]:
+    async def get_chats(self, from_date: str | None = None) -> list[Chat]:
         """List recent chat room messages.
 
         Wraps ``GET /v1/getchats``.
@@ -155,5 +159,5 @@ class PublicAPI(SyncEngine):
             from_date: ISO 8601 timestamp; only messages after it are returned.
                 Defaults to the last five days.
         """
-        data = self._get("/v1/getchats", build_params(from_date=from_date))
+        data = await self._get("/v1/getchats", build_params(from_date=from_date))
         return [Chat.model_validate(c) for c in data]

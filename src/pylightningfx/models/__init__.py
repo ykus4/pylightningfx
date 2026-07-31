@@ -1,9 +1,16 @@
+"""Pydantic models for every API response.
+
+Re-exported from the package root, so ``from pylightningfx import Ticker`` works
+and this module is only needed when you want the grouping.
+"""
+
 from .private import (
     Address,
     Balance,
     BalanceHistory,
     BankAccount,
     ChildOrder,
+    ChildOrderResponse,
     CoinIn,
     CoinOut,
     Collateral,
@@ -14,9 +21,11 @@ from .private import (
     ParentOrder,
     ParentOrderDetail,
     ParentOrderParameter,
+    ParentOrderResponse,
     Position,
     TradingCommission,
     Withdrawal,
+    WithdrawResponse,
 )
 from .public import (
     Board,
@@ -31,37 +40,41 @@ from .public import (
     Market,
     Ticker,
 )
+from .realtime import ChildOrderEvent, ParentOrderEvent
 
 __all__ = [
-    # public
-    "Board",
-    "BoardEntry",
-    "BoardState",
-    "Chat",
-    "CorporateLeverage",
-    "Execution",
-    "FundingRate",
-    "FundingRateHistory",
-    "Health",
-    "Market",
-    "Ticker",
-    # private
     "Address",
     "Balance",
     "BalanceHistory",
     "BankAccount",
+    "Board",
+    "BoardEntry",
+    "BoardState",
+    "Chat",
     "ChildOrder",
+    "ChildOrderEvent",
+    "ChildOrderResponse",
     "CoinIn",
     "CoinOut",
     "Collateral",
     "CollateralAccount",
     "CollateralHistory",
+    "CorporateLeverage",
     "Deposit",
+    "Execution",
+    "FundingRate",
+    "FundingRateHistory",
+    "Health",
+    "Market",
     "MyExecution",
     "ParentOrder",
     "ParentOrderDetail",
+    "ParentOrderEvent",
     "ParentOrderParameter",
+    "ParentOrderResponse",
     "Position",
+    "Ticker",
     "TradingCommission",
+    "WithdrawResponse",
     "Withdrawal",
 ]

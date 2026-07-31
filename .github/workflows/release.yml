@@ -6,10 +6,32 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
+  # Publishing to PyPI is irreversible — a version number can never be reused —
+  # so everything gets verified before the release job runs at all.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --group dev
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run pytest
+      - name: Check the tag matches the packaged version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          packaged=$(uv run python -c 'import pylightningfx; print(pylightningfx.__version__)')
+          if [ "$tag" != "$packaged" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match version $packaged in pyproject.toml"
+            exit 1
+          fi
+
   release:
+    needs: verify
     runs-on: ubuntu-latest
     environment: pypi
     permissions:

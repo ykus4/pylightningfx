@@ -25,6 +25,32 @@ theme:
 
 plugins:
   - search
+  # The i18n plugin renders every identifier twice, once per language tree, so a
+  # bare cross-reference is ambiguous. resolve_closest picks the copy in the same
+  # language as the referring page.
+  - autorefs:
+      resolve_closest: true
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            docstring_section_style: table
+            show_source: false
+            members_order: source
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            heading_level: 2
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: false
+            merge_init_into_class: true
+            inherited_members: false
+            filters: ["!^_"]
   - i18n:
       docs_structure: suffix
       languages:
@@ -39,8 +65,12 @@ plugins:
 nav:
   - Home: index.md
   - API Reference:
-    - Public API: api/public.md
-    - Private API: api/private.md
+    - Clients: api/client.md
+    - Realtime: api/realtime.md
+    - Models: api/models.md
+    - Configuration: api/config.md
+    - Errors: api/errors.md
+    - Enums: api/enums.md
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -49,3 +79,7 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - admonition
   - pymdownx.details
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
